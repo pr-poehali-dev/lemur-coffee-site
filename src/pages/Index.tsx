@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -37,8 +37,21 @@ const Index = () => {
   const [cities] = useState(['Москва', 'Санкт-Петербург', 'Новосибирск', 'Екатеринбург']);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [newDrink, setNewDrink] = useState<Partial<DrinkItem>>({});
+  const [animatingItems, setAnimatingItems] = useState<Set<string>>(new Set());
+  const cartButtonRef = useRef<HTMLButtonElement>(null);
 
   const addToCart = (drink: DrinkItem) => {
+    // Анимация добавления
+    setAnimatingItems(prev => new Set([...prev, drink.id]));
+    
+    // Эффект пульсации корзины
+    if (cartButtonRef.current) {
+      cartButtonRef.current.classList.add('animate-pulse');
+      setTimeout(() => {
+        cartButtonRef.current?.classList.remove('animate-pulse');
+      }, 600);
+    }
+    
     setCart(prev => {
       const existing = prev.find(item => item.id === drink.id);
       if (existing) {
@@ -48,6 +61,15 @@ const Index = () => {
       }
       return [...prev, { ...drink, quantity: 1 }];
     });
+    
+    // Убираем анимацию через время
+    setTimeout(() => {
+      setAnimatingItems(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(drink.id);
+        return newSet;
+      });
+    }, 800);
   };
 
   const removeFromCart = (id: string) => {
@@ -110,10 +132,10 @@ const Index = () => {
             <div className="flex items-center space-x-4">
               <Sheet>
                 <SheetTrigger asChild>
-                  <Button variant="outline" className="relative">
+                  <Button ref={cartButtonRef} variant="outline" className="relative transition-all duration-300 hover:scale-105">
                     <Icon name="ShoppingCart" size={20} />
                     {cart.length > 0 && (
-                      <Badge className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center bg-rose-500">
+                      <Badge className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center bg-rose-500 animate-bounce">
                         {cart.reduce((sum, item) => sum + item.quantity, 0)}
                       </Badge>
                     )}
@@ -287,7 +309,12 @@ const Index = () => {
                   <CardContent>
                     <div className="flex justify-between items-center">
                       <span className="text-2xl font-bold text-rose-600">{drink.price}₽</span>
-                      <Button onClick={() => addToCart(drink)} className="bg-mint-500 hover:bg-mint-600">
+                      <Button 
+                        onClick={() => addToCart(drink)} 
+                        className={`bg-mint-500 hover:bg-mint-600 transition-all duration-300 hover:scale-105 ${
+                          animatingItems.has(drink.id) ? 'animate-pulse bg-mint-600 scale-105' : ''
+                        }`}
+                      >
                         <Icon name="Plus" size={16} className="mr-1" />
                         В корзину
                       </Button>
@@ -325,7 +352,12 @@ const Index = () => {
                           {Math.round(drink.price * (1 - (drink.discount || 0) / 100))}₽
                         </span>
                       </div>
-                      <Button onClick={() => addToCart(drink)} className="bg-rose-500 hover:bg-rose-600">
+                      <Button 
+                        onClick={() => addToCart(drink)} 
+                        className={`bg-rose-500 hover:bg-rose-600 transition-all duration-300 hover:scale-105 ${
+                          animatingItems.has(drink.id) ? 'animate-pulse bg-rose-600 scale-105' : ''
+                        }`}
+                      >
                         <Icon name="Plus" size={16} className="mr-1" />
                         В корзину
                       </Button>
@@ -379,7 +411,12 @@ const Index = () => {
                         <span className="text-2xl font-bold text-rose-600">{drink.price}₽</span>
                       )}
                     </div>
-                    <Button onClick={() => addToCart(drink)} className="bg-mint-500 hover:bg-mint-600">
+                    <Button 
+                      onClick={() => addToCart(drink)} 
+                      className={`bg-mint-500 hover:bg-mint-600 transition-all duration-300 hover:scale-105 ${
+                        animatingItems.has(drink.id) ? 'animate-pulse bg-mint-600 scale-105' : ''
+                      }`}
+                    >
                       <Icon name="Plus" size={16} className="mr-1" />
                       В корзину
                     </Button>
