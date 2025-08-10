@@ -3,12 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Icon from '@/components/ui/icon';
+import AdminPanel from '@/components/AdminPanel';
 
 interface DrinkItem {
   id: string;
@@ -34,9 +30,16 @@ const Index = () => {
   ]);
 
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [cities] = useState(['Москва', 'Санкт-Петербург', 'Новосибирск', 'Екатеринбург']);
-  const [isAdminOpen, setIsAdminOpen] = useState(false);
-  const [newDrink, setNewDrink] = useState<Partial<DrinkItem>>({});
+  const [cities, setCities] = useState(['Москва', 'Новосибирск']);
+  const [siteSettings, setSiteSettings] = useState({
+    title: 'Lemurr Coffee',
+    description: 'Лучший кофе в городе',
+    heroTitle: 'Добро пожаловать в мир вкуса ☕',
+    heroSubtitle: 'Lemurr Coffee — это не просто кофе, это особая атмосфера уюта и качества. Мы готовим каждую чашку с любовью, используя лучшие зерна со всего мира.',
+    phone: '+7 (999) 123-45-67',
+    email: 'info@lemurrcoffee.ru',
+    address: 'ул. Кофейная, 1, Москва'
+  });
   const [animatingItems, setAnimatingItems] = useState<Set<string>>(new Set());
   const cartButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -93,27 +96,6 @@ const Index = () => {
     }, 0);
   };
 
-  const addNewDrink = () => {
-    if (newDrink.name && newDrink.price && newDrink.category) {
-      const drink: DrinkItem = {
-        id: Date.now().toString(),
-        name: newDrink.name,
-        description: newDrink.description || '',
-        price: Number(newDrink.price),
-        category: newDrink.category as DrinkItem['category'],
-        isNew: newDrink.isNew || false,
-        discount: newDrink.discount || undefined
-      };
-      setDrinks(prev => [...prev, drink]);
-      setNewDrink({});
-      setIsAdminOpen(false);
-    }
-  };
-
-  const deleteDrink = (id: string) => {
-    setDrinks(prev => prev.filter(drink => drink.id !== id));
-  };
-
   const newItems = drinks.filter(drink => drink.isNew);
   const discountItems = drinks.filter(drink => drink.discount);
 
@@ -126,7 +108,7 @@ const Index = () => {
             <div className="flex items-center space-x-3">
               <img src="/img/f58b4aed-af91-4db7-ab40-d20742f45668.jpg" alt="Lemurr Coffee" className="h-12 w-12 rounded-full object-cover" />
               <h1 className="text-2xl font-bold text-rose-800" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                Lemurr Coffee
+                {siteSettings.title}
               </h1>
             </div>
             <div className="flex items-center space-x-4">
@@ -207,67 +189,7 @@ const Index = () => {
                 </SheetContent>
               </Sheet>
               
-              <Dialog open={isAdminOpen} onOpenChange={setIsAdminOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="outline">
-                    <Icon name="Settings" size={20} />
-                    Управление
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-md">
-                  <DialogHeader>
-                    <DialogTitle>Панель управления</DialogTitle>
-                    <DialogDescription>Добавьте новый напиток в меню</DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="name">Название</Label>
-                      <Input
-                        id="name"
-                        value={newDrink.name || ''}
-                        onChange={(e) => setNewDrink(prev => ({ ...prev, name: e.target.value }))}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="description">Описание</Label>
-                      <Textarea
-                        id="description"
-                        value={newDrink.description || ''}
-                        onChange={(e) => setNewDrink(prev => ({ ...prev, description: e.target.value }))}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="price">Цена</Label>
-                      <Input
-                        id="price"
-                        type="number"
-                        value={newDrink.price || ''}
-                        onChange={(e) => setNewDrink(prev => ({ ...prev, price: Number(e.target.value) }))}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="category">Категория</Label>
-                      <Select
-                        value={newDrink.category}
-                        onValueChange={(value) => setNewDrink(prev => ({ ...prev, category: value }))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Выберите категорию" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="coffee">Кофе</SelectItem>
-                          <SelectItem value="tea">Чай</SelectItem>
-                          <SelectItem value="cold">Холодные напитки</SelectItem>
-                          <SelectItem value="dessert">Десерты</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <Button onClick={addNewDrink} className="w-full">
-                      Добавить напиток
-                    </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
+
             </div>
           </div>
         </div>
@@ -277,10 +199,10 @@ const Index = () => {
       <section className="py-20 bg-gradient-to-r from-rose-100 to-mint-100">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-5xl font-bold text-rose-800 mb-6" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-            Добро пожаловать в Lemurr Coffee
+            {siteSettings.heroTitle}
           </h2>
           <p className="text-xl text-rose-700 mb-8 max-w-2xl mx-auto">
-            Уютная атмосфера, ароматный кофе и дружелюбные лемуры ждут вас в наших кофейнях
+            {siteSettings.heroSubtitle}
           </p>
           <Button size="lg" className="bg-rose-500 hover:bg-rose-600 text-white">
             <Icon name="Coffee" size={20} className="mr-2" />
@@ -380,17 +302,7 @@ const Index = () => {
             {drinks.map(drink => (
               <Card key={drink.id} className="hover:shadow-lg transition-shadow relative">
                 <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <CardTitle className="text-rose-700">{drink.name}</CardTitle>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => deleteDrink(drink.id)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <Icon name="Trash2" size={16} />
-                    </Button>
-                  </div>
+                  <CardTitle className="text-rose-700">{drink.name}</CardTitle>
                   <CardDescription>{drink.description}</CardDescription>
                   <div className="flex space-x-2">
                     {drink.isNew && <Badge className="bg-mint-500 text-white">Новинка</Badge>}
@@ -455,14 +367,14 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-8">
             <div>
-              <h4 className="text-xl font-bold mb-4" style={{ fontFamily: 'Montserrat, sans-serif' }}>Lemurr Coffee</h4>
-              <p className="text-rose-200">Лучший кофе в городе с заботой о каждом госте</p>
+              <h4 className="text-xl font-bold mb-4" style={{ fontFamily: 'Montserrat, sans-serif' }}>{siteSettings.title}</h4>
+              <p className="text-rose-200">{siteSettings.description}</p>
             </div>
             <div>
               <h5 className="font-semibold mb-4">Контакты</h5>
               <div className="space-y-2 text-rose-200">
-                <p>📞 +7 (495) 123-45-67</p>
-                <p>📧 hello@lemurr-coffee.ru</p>
+                <p>📞 {siteSettings.phone}</p>
+                <p>📧 {siteSettings.email}</p>
                 <p>🕒 Ежедневно с 7:00 до 23:00</p>
               </div>
             </div>
@@ -486,6 +398,16 @@ const Index = () => {
           </div>
         </div>
       </footer>
+
+      {/* Admin Panel */}
+      <AdminPanel 
+        drinks={drinks}
+        setDrinks={setDrinks}
+        cities={cities}
+        setCities={setCities}
+        siteSettings={siteSettings}
+        setSiteSettings={setSiteSettings}
+      />
     </div>
   );
 };
