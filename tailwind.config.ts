@@ -6,7 +6,7 @@ export default {
 		"./pages/**/*.{ts,tsx}",
 		"./components/**/*.{ts,tsx}",
 		"./app/**/*.{ts,tsx}",
-		"./src/**/*.{ts,tsx}",
+		"./src/**/*.{ts,tsx}"
 	],
 	prefix: "",
 	theme: {
@@ -61,6 +61,30 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				rose: {
+					50: "#fef7f7",
+					100: "#fce4e6",
+					200: "#f8bbd9",
+					300: "#f28cb1", 
+					400: "#ec4899",
+					500: "#e11d48",
+					600: "#be123c",
+					700: "#9f1239",
+					800: "#881337",
+					900: "#701a2e"
+				},
+				mint: {
+					50: "#f0fdf5",
+					100: "#dcfce9", 
+					200: "#b8e6b8",
+					300: "#86efac",
+					400: "#4ade80",
+					500: "#22c55e",
+					600: "#16a34a", 
+					700: "#15803d",
+					800: "#166534",
+					900: "#14532d"
 				}
 			},
 			borderRadius: {
